@@ -24476,13 +24476,14 @@
 					let column = this.columns[this.index];
 
 					if(column){
-
-						// If the browser window is reduced very rapidly, the width of this column may still be outdated
-						// and much larger than it actually is. Therefore, recalculate the actual width of the column before it is hidden.
-						// (prevent recursion when doing so)
-						this.preventRedrawRecursion = true;
-						this.table.redraw(true);
-						this.preventRedrawRecursion = false;
+						if(this.table.initialized){
+							// If the browser window is reduced very rapidly, the width of this column may still be outdated
+							// and much larger than it actually is. Therefore, recalculate the actual width of the column before it is hidden.
+							// (prevent recursion when doing so)
+							this.preventRedrawRecursion = true;
+							this.table.redraw(true);
+							this.preventRedrawRecursion = false;
+						}
 
 						this.hideColumn(column);
 						this.index ++;
