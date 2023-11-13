@@ -56,7 +56,6 @@
     "globby": "^11.0.2",
     "postcss": "^8.2.4",
     "postcss-prettify": "^0.3.4",
-    "node-sass": "^7.0.3",
     "rollup": "^2.36.1",
     "rollup-plugin-license": "^2.2.0",
     "rollup-plugin-postcss": "^4.0.0",
