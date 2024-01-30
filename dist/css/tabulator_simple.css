@@ -2,7 +2,7 @@
   position: relative;
   border: 1px solid #999;
   background-color: #fff;
-  font-size: 14px;
+  /*font-size:$textSize;*/
   text-align: left;
   overflow: hidden;
   -webkit-transform: translateZ(0);
@@ -574,7 +574,7 @@
 }
 
 .tabulator-row .tabulator-responsive-collapse table {
-  font-size: 14px;
+      /*font-size:$textSize;*/
 }
 
 .tabulator-row .tabulator-responsive-collapse table tr td {
@@ -854,7 +854,7 @@
   background: #fff;
   border: 1px solid #ddd;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
-  font-size: 14px;
+  /*	font-size:$textSize;*/
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   z-index: 10000;
@@ -917,7 +917,7 @@
 
 .tabulator-edit-list {
   max-height: 200px;
-  font-size: 14px;
+  /*	font-size:$textSize;*/
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
