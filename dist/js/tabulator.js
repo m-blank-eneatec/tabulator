@@ -3,7 +3,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Tabulator = factory());
-})(this, (function () { 'use strict';
+}(this, (function () { 'use strict';
 
 	var defaultOptions = {
 
@@ -303,7 +303,7 @@
 		}
 
 		getParentColumn(){
-			return this._column.parent instanceof Column$1 ? this._column.parent.getComponent() : false;
+			return this._column.parent instanceof Column ? this._column.parent.getComponent() : false;
 		}
 
 		_getSelf(){
@@ -1697,8 +1697,6 @@
 
 	Column.defaultOptionList = defaultColumnOptions;
 
-	var Column$1 = Column;
-
 	class Helpers{
 
 		static elVisible(el){
@@ -2875,7 +2873,7 @@
 		}
 		
 		_addColumn(definition, before, nextToColumn){
-			var column = new Column$1(definition, this),
+			var column = new Column(definition, this),
 			colEl = column.getElement(),
 			index = nextToColumn ? this.findColumnIndex(nextToColumn) : nextToColumn;
 			
@@ -2960,7 +2958,7 @@
 
 			if(typeof subject == "object"){
 				
-				if(subject instanceof Column$1){
+				if(subject instanceof Column){
 					//subject is column element
 					return subject;
 				}else if(subject instanceof ColumnComponent){
@@ -6696,7 +6694,7 @@
 					}
 				}
 
-			}else if((typeof HTMLElement !== "undefined" && query instanceof HTMLElement) || query instanceof Tabulator$1){
+			}else if((typeof HTMLElement !== "undefined" && query instanceof HTMLElement) || query instanceof Tabulator){
 				match = TableRegistry.matchElement(query);
 
 				if(match){
@@ -6717,16 +6715,14 @@
 
 		static matchElement(element){
 			return TableRegistry.tables.find(function(table){
-				return element instanceof Tabulator$1 ? table === element : table.element === element;
+				return element instanceof Tabulator ? table === element : table.element === element;
 			});
 		}
 	}
 
 	TableRegistry.tables = [];
 
-	var TableRegistry$1 = TableRegistry;
-
-	class Popup$2 extends CoreFeature{
+	class Popup extends CoreFeature{
 		constructor(table, element, parent){
 			super(table);
 			
@@ -7023,7 +7019,7 @@
 				this.childPopup.hide();
 			}
 			
-			this.childPopup = new Popup$2(this.table, element, this);
+			this.childPopup = new Popup(this.table, element, this);
 			
 			return this.childPopup;
 		}
@@ -7150,7 +7146,7 @@
 		///////////////////////////////////
 		
 		popup(menuEl, menuContainer){
-			return new Popup$2(this.table, menuEl, menuContainer);
+			return new Popup(this.table, menuEl, menuContainer);
 		}
 		
 		///////////////////////////////////
@@ -7166,8 +7162,6 @@
 		}
 		
 	}
-
-	var Module$1 = Module;
 
 	//resize columns to fit data they contain
 	function fitData(columns, forced){
@@ -7412,7 +7406,7 @@
 		fitColumns:fitColumns ,
 	};
 
-	class Layout extends Module$1{
+	class Layout extends Module{
 
 		constructor(table){
 			super(table, "layout");
@@ -7467,8 +7461,6 @@
 	//load defaults
 	Layout.modes = defaultModes;
 
-	var Layout$1 = Layout;
-
 	var defaultLangs = {
 		"default":{ //hold default locale text
 			"groups":{
@@ -7507,7 +7499,7 @@
 		},
 	};
 
-	class Localize extends Module$1{
+	class Localize extends Module{
 
 		constructor(table){
 			super(table);
@@ -7686,9 +7678,7 @@
 	//load defaults
 	Localize.langs = defaultLangs;
 
-	var Localize$1 = Localize;
-
-	class Comms extends Module$1{
+	class Comms extends Module{
 
 		constructor(table){
 			super(table);
@@ -7702,7 +7692,7 @@
 			var connections = [],
 			connection;
 
-			connection = TableRegistry$1.lookupTable(selectors);
+			connection = TableRegistry.lookupTable(selectors);
 
 			connection.forEach((con) =>{
 				if(this.table !== con){
@@ -7736,13 +7726,11 @@
 
 	Comms.moduleName = "comms";
 
-	var Comms$1 = Comms;
-
 	var coreModules = /*#__PURE__*/Object.freeze({
 		__proto__: null,
-		LayoutModule: Layout$1,
-		LocalizeModule: Localize$1,
-		CommsModule: Comms$1
+		LayoutModule: Layout,
+		LocalizeModule: Localize,
+		CommsModule: Comms
 	});
 
 	class ModuleBinder {
@@ -7794,7 +7782,7 @@
 			};
 			
 			tabulator.findTable = function(query){
-				var results = TableRegistry$1.lookupTable(query, true);
+				var results = TableRegistry.lookupTable(query, true);
 				return Array.isArray(results) && !results.length ? false : results;
 			};
 			
@@ -7952,7 +7940,7 @@
 				});
 			}
 			
-			TableRegistry$1.register(this); //register table for inter-device communication
+			TableRegistry.register(this); //register table for inter-device communication
 		}
 		
 		initializeElement(element){
@@ -8172,7 +8160,7 @@
 			
 			this.destroyed = true;
 			
-			TableRegistry$1.deregister(this); //deregister table from inter-device communication
+			TableRegistry.deregister(this); //deregister table from inter-device communication
 			
 			this.eventBus.dispatch("table-destroy");
 			
@@ -8779,11 +8767,9 @@
 	//bind modules and static functionality
 	new ModuleBinder(Tabulator);
 
-	var Tabulator$1 = Tabulator;
-
 	var defaultAccessors = {};
 
-	class Accessor extends Module$1{
+	class Accessor extends Module{
 
 		constructor(table){
 			super(table);
@@ -8893,24 +8879,22 @@
 	Accessor.moduleName = "accessor";
 	Accessor.accessors = defaultAccessors;
 
-	var Accessor$1 = Accessor;
-
 	var defaultConfig = {
 		method: "GET",
 	};
 
-	function generateParamsList$1(data, prefix){
+	function generateParamsList(data, prefix){
 		var output = [];
 
 		prefix = prefix || "";
 
 		if(Array.isArray(data)){
 			data.forEach((item, i) => {
-				output = output.concat(generateParamsList$1(item, prefix ? prefix + "[" + i + "]" : i));
+				output = output.concat(generateParamsList(item, prefix ? prefix + "[" + i + "]" : i));
 			});
 		}else if (typeof data === "object"){
 			for (var key in data){
-				output = output.concat(generateParamsList$1(data[key], prefix ? prefix + "[" + key + "]" : key));
+				output = output.concat(generateParamsList(data[key], prefix ? prefix + "[" + key + "]" : key));
 			}
 		}else {
 			output.push({key:prefix, value:data});
@@ -8920,7 +8904,7 @@
 	}
 
 	function serializeParams(params){
-		var output = generateParamsList$1(params),
+		var output = generateParamsList(params),
 		encoded = [];
 
 		output.forEach(function(item){
@@ -9032,18 +9016,18 @@
 		});
 	}
 
-	function generateParamsList(data, prefix){
+	function generateParamsList$1(data, prefix){
 		var output = [];
 
 		prefix = prefix || "";
 
 		if(Array.isArray(data)){
 			data.forEach((item, i) => {
-				output = output.concat(generateParamsList(item, prefix ? prefix + "[" + i + "]" : i));
+				output = output.concat(generateParamsList$1(item, prefix ? prefix + "[" + i + "]" : i));
 			});
 		}else if (typeof data === "object"){
 			for (var key in data){
-				output = output.concat(generateParamsList(data[key], prefix ? prefix + "[" + key + "]" : key));
+				output = output.concat(generateParamsList$1(data[key], prefix ? prefix + "[" + key + "]" : key));
 			}
 		}else {
 			output.push({key:prefix, value:data});
@@ -9066,7 +9050,7 @@
 			},
 			body:function(url, config, params){
 
-				var output = generateParamsList(params),
+				var output = generateParamsList$1(params),
 				form = new FormData();
 
 				output.forEach(function(item){
@@ -9078,7 +9062,7 @@
 		},
 	};
 
-	class Ajax extends Module$1{
+	class Ajax extends Module{
 		
 		constructor(table){
 			super(table);
@@ -9214,8 +9198,6 @@
 	Ajax.defaultLoaderPromise = defaultLoaderPromise;
 	Ajax.contentTypeFormatters = defaultContentTypeFormatters;
 
-	var Ajax$1 = Ajax;
-
 	var defaultPasteActions = {
 		replace:function(rows){
 			return this.table.setData(rows);
@@ -9304,7 +9286,7 @@
 		}
 	};
 
-	class Clipboard extends Module$1{
+	class Clipboard extends Module{
 
 		constructor(table){
 			super(table);
@@ -9578,8 +9560,6 @@
 	Clipboard.pasteActions = defaultPasteActions;
 	Clipboard.pasteParsers = defaultPasteParsers;
 
-	var Clipboard$1 = Clipboard;
-
 	class CalcComponent{
 		constructor (row){
 			this._row = row;
@@ -9626,8 +9606,6 @@
 			return this._row;
 		}
 	}
-
-	var CalcComponent$1 = CalcComponent;
 
 	var defaultCalculations = {
 		"avg":function(values, data, calcParams){
@@ -9723,7 +9701,7 @@
 		},
 	};
 
-	class ColumnCalcs extends Module$1{
+	class ColumnCalcs extends Module{
 		
 		constructor(table){
 			super(table);
@@ -9760,7 +9738,7 @@
 		}
 		
 		initialize(){
-			this.genColumn = new Column$1({field:"value"}, this);
+			this.genColumn = new Column({field:"value"}, this);
 			
 			this.subscribe("cell-value-changed", this.cellValueChanged.bind(this));
 			this.subscribe("column-init", this.initializeColumnCheck.bind(this));
@@ -10143,7 +10121,7 @@
 			
 			row.getComponent = () => {
 				if(!row.component){
-					row.component = new CalcComponent$1(row);
+					row.component = new CalcComponent(row);
 				}
 				
 				return row.component;
@@ -10294,9 +10272,7 @@
 	//load defaults
 	ColumnCalcs.calculations = defaultCalculations;
 
-	var ColumnCalcs$1 = ColumnCalcs;
-
-	class DataTree extends Module$1{
+	class DataTree extends Module{
 
 		constructor(table){
 			super(table);
@@ -10896,8 +10872,6 @@
 
 	DataTree.moduleName = "dataTree";
 
-	var DataTree$1 = DataTree;
-
 	function csv(list, options = {}, setFileContents){
 		var delimiter = options.delimiter ? options.delimiter : ",",
 		fileContents = [],
@@ -10960,7 +10934,7 @@
 		setFileContents(fileContents, "text/csv");
 	}
 
-	function json$1(list, options, setFileContents){
+	function json(list, options, setFileContents){
 		var fileContents = [];
 
 		list.forEach((row) => {
@@ -11208,7 +11182,7 @@
 		setFileContents(s2ab(output), "application/octet-stream");
 	}
 
-	function html$1(list, options, setFileContents){
+	function html(list, options, setFileContents){
 		if(this.modExists("export", true)){
 			setFileContents(this.modules.export.generateHTMLTable(list), "text/html");
 		}
@@ -11249,14 +11223,14 @@
 
 	var defaultDownloaders = {
 		csv:csv,
-		json:json$1,
+		json:json,
 		jsonLines:jsonLines,
 		pdf:pdf,
 		xlsx:xlsx,
-		html:html$1,
+		html:html,
 	};
 
-	class Download extends Module$1{
+	class Download extends Module{
 
 		constructor(table){
 			super(table);
@@ -11399,8 +11373,6 @@
 
 	//load defaults
 	Download.downloaders = defaultDownloaders;
-
-	var Download$1 = Download;
 
 	function maskInput(el, options){
 		var mask = options.mask,
@@ -11554,7 +11526,7 @@
 	}
 
 	//resizable text area element
-	function textarea$1(cell, onRendered, success, cancel, editorParams){
+	function textarea(cell, onRendered, success, cancel, editorParams){
 		var cellValue = cell.getValue(),
 		vertNav = editorParams.verticalNavigation || "hybrid",
 		value = String(cellValue !== null && typeof cellValue !== "undefined"  ? cellValue : ""),
@@ -11676,7 +11648,7 @@
 	}
 
 	//input element with type of number
-	function number$1(cell, onRendered, success, cancel, editorParams){
+	function number(cell, onRendered, success, cancel, editorParams){
 		var cellValue = cell.getValue(),
 		vertNav = editorParams.verticalNavigation || "editor",
 		input = document.createElement("input");
@@ -11867,7 +11839,7 @@
 	}
 
 	//input element
-	function date$1(cell, onRendered, success, cancel, editorParams){
+	function date(cell, onRendered, success, cancel, editorParams){
 		var inputFormat = editorParams.format,
 		vertNav = editorParams.verticalNavigation || "editor",
 		DT = inputFormat ? (window.DateTime || luxon.DateTime) : null;
@@ -12006,7 +11978,7 @@
 	}
 
 	//input element
-	function time$1(cell, onRendered, success, cancel, editorParams){
+	function time(cell, onRendered, success, cancel, editorParams){
 		var inputFormat = editorParams.format,
 		vertNav = editorParams.verticalNavigation || "editor",
 		DT = inputFormat ? (window.DateTime || luxon.DateTime) : null, 
@@ -12133,7 +12105,7 @@
 	}
 
 	//input element
-	function datetime$2(cell, onRendered, success, cancel, editorParams){
+	function datetime(cell, onRendered, success, cancel, editorParams){
 		var inputFormat = editorParams.format,
 		vertNav = editorParams.verticalNavigation || "editor",
 		DT = inputFormat ? (window.DateTime || luxon.DateTime) : null, 
@@ -12258,7 +12230,7 @@
 		return input;
 	}
 
-	class Edit$2{
+	class Edit{
 		constructor(editor, cell, onRendered, success, cancel, editorParams){
 			this.edit = editor;
 			this.table = editor.table;
@@ -13308,13 +13280,13 @@
 
 		this.deprecationMsg("The select editor has been deprecated, please use the new list editor");
 
-		var list = new Edit$2(this, cell, onRendered, success, cancel, editorParams);
+		var list = new Edit(this, cell, onRendered, success, cancel, editorParams);
 
 		return list.input;
 	}
 
 	function list(cell, onRendered, success, cancel, editorParams){
-		var list = new Edit$2(this, cell, onRendered, success, cancel, editorParams);
+		var list = new Edit(this, cell, onRendered, success, cancel, editorParams);
 
 		return list.input;
 	}
@@ -13325,13 +13297,13 @@
 
 		editorParams.autocomplete = true;
 
-		var list = new Edit$2(this, cell, onRendered, success, cancel, editorParams);
+		var list = new Edit(this, cell, onRendered, success, cancel, editorParams);
 
 		return list.input;
 	}
 
 	//star rating
-	function star$1(cell, onRendered, success, cancel, editorParams){
+	function star(cell, onRendered, success, cancel, editorParams){
 		var self = this,
 		element = cell.getElement(),
 		value = cell.getValue(),
@@ -13478,7 +13450,7 @@
 	}
 
 	//draggable progress bar
-	function progress$1(cell, onRendered, success, cancel, editorParams){
+	function progress(cell, onRendered, success, cancel, editorParams){
 		var element = cell.getElement(),
 		max = typeof editorParams.max === "undefined" ? ((element.getElementsByTagName("div")[0] && element.getElementsByTagName("div")[0].getAttribute("max")) || 100) : editorParams.max,
 		min = typeof editorParams.min === "undefined" ? ((element.getElementsByTagName("div")[0] && element.getElementsByTagName("div")[0].getAttribute("min")) || 0) : editorParams.min,
@@ -13606,7 +13578,7 @@
 	}
 
 	//checkbox
-	function tickCross$1(cell, onRendered, success, cancel, editorParams){
+	function tickCross(cell, onRendered, success, cancel, editorParams){
 		var value = cell.getValue(),
 		input = document.createElement("input"),
 		tristate = editorParams.tristate,
@@ -13703,21 +13675,21 @@
 
 	var defaultEditors = {
 		input:input,
-		textarea:textarea$1,
-		number:number$1,
+		textarea:textarea,
+		number:number,
 		range:range,
-		date:date$1,
-		time:time$1,
-		datetime:datetime$2,
+		date:date,
+		time:time,
+		datetime:datetime,
 		select:select,
 		list:list,
 		autocomplete:autocomplete,
-		star:star$1,
-		progress:progress$1,
-		tickCross:tickCross$1,
+		star:star,
+		progress:progress,
+		tickCross:tickCross,
 	};
 
-	class Edit extends Module$1{
+	class Edit$1 extends Module{
 		
 		constructor(table){
 			super(table);
@@ -13728,7 +13700,7 @@
 			this.invalidEdit = false;
 			this.editedCells = [];
 			
-			this.editors = Edit.editors;
+			this.editors = Edit$1.editors;
 			
 			this.registerColumnOption("editable");
 			this.registerColumnOption("editor");
@@ -14438,13 +14410,10 @@
 		}
 	}
 
-	Edit.moduleName = "edit";
+	Edit$1.moduleName = "edit";
 
 	//load defaults
-	Edit.editors = defaultEditors;
-
-
-	var Edit$1 = Edit;
+	Edit$1.editors = defaultEditors;
 
 	class ExportRow{
 		constructor(type, columns, component, indent){
@@ -14454,8 +14423,6 @@
 			this.indent = indent || 0;
 		}
 	}
-
-	var ExportRow$1 = ExportRow;
 
 	class ExportColumn{
 		constructor(value, component, width, height, depth){
@@ -14467,9 +14434,7 @@
 		}
 	}
 
-	var ExportColumn$1 = ExportColumn;
-
-	class Export extends Module$1{
+	class Export extends Module{
 		
 		constructor(table){
 			super(table);
@@ -14681,13 +14646,13 @@
 				header.forEach((col) => {
 					if(col){
 						let title = typeof col.title === "undefined" ? "" : col.title;
-						columns.push(new ExportColumn$1(title, col.column.getComponent(), col.width, col.height, col.depth));
+						columns.push(new ExportColumn(title, col.column.getComponent(), col.width, col.height, col.depth));
 					}else {
 						columns.push(null);
 					}
 				});
 				
-				exportRows.push(new ExportRow$1("header", columns));
+				exportRows.push(new ExportRow("header", columns));
 			});
 			
 			return exportRows;
@@ -14737,13 +14702,13 @@
 				switch(row.type){
 					case "group":
 						indent = row.level;
-						exportCols.push(new ExportColumn$1(row.key, row.getComponent(), columns.length, 1));
+						exportCols.push(new ExportColumn(row.key, row.getComponent(), columns.length, 1));
 						break;
 					
 					case "calc" :
 					case "row" :
 						columns.forEach((col) => {
-							exportCols.push(new ExportColumn$1(col._column.getFieldValue(rowData), col, 1, 1));
+							exportCols.push(new ExportColumn(col._column.getFieldValue(rowData), col, 1, 1));
 						});
 					
 						if(this.table.options.dataTree && this.config.dataTree !== false){
@@ -14752,7 +14717,7 @@
 						break;
 				}
 				
-				exportRows.push(new ExportRow$1(row.type, exportCols, row.getComponent(), indent));
+				exportRows.push(new ExportRow(row.type, exportCols, row.getComponent(), indent));
 			});
 			
 			return exportRows;
@@ -15089,8 +15054,6 @@
 
 	Export.moduleName = "export";
 
-	var Export$1 = Export;
-
 	var defaultFilters = {
 
 		//equal to
@@ -15200,7 +15163,7 @@
 		},
 	};
 
-	class Filter extends Module$1{
+	class Filter extends Module{
 
 		constructor(table){
 			super(table);
@@ -16099,17 +16062,15 @@
 	//load defaults
 	Filter.filters = defaultFilters;
 
-	var Filter$1 = Filter;
-
 	function plaintext(cell, formatterParams, onRendered){
 		return this.emptyToSpace(this.sanitizeHTML(cell.getValue()));
 	}
 
-	function html(cell, formatterParams, onRendered){
+	function html$1(cell, formatterParams, onRendered){
 		return cell.getValue();
 	}
 
-	function textarea(cell, formatterParams, onRendered){
+	function textarea$1(cell, formatterParams, onRendered){
 		cell.getElement().style.whiteSpace = "pre-wrap";
 		return this.emptyToSpace(this.sanitizeHTML(cell.getValue()));
 	}
@@ -16280,7 +16241,7 @@
 		return el;
 	}
 
-	function tickCross(cell, formatterParams, onRendered){
+	function tickCross$1(cell, formatterParams, onRendered){
 		var value = cell.getValue(),
 		element = cell.getElement(),
 		empty = formatterParams.allowEmpty,
@@ -16394,7 +16355,7 @@
 		return formatterParams[value];
 	}
 
-	function star(cell, formatterParams, onRendered){
+	function star$1(cell, formatterParams, onRendered){
 		var value = cell.getValue(),
 		element = cell.getElement(),
 		maxStars = formatterParams && formatterParams.stars ? formatterParams.stars : 5,
@@ -16481,7 +16442,7 @@
 		return el;
 	}
 
-	function progress(cell, formatterParams = {}, onRendered){ //progress bar
+	function progress$1(cell, formatterParams = {}, onRendered){ //progress bar
 		var value = this.sanitizeHTML(cell.getValue()) || 0,
 		element = cell.getElement(),
 		max = formatterParams.max ? formatterParams.max : 100,
@@ -16748,18 +16709,18 @@
 
 	var defaultFormatters = {
 		plaintext:plaintext,
-		html:html,
-		textarea:textarea,
+		html:html$1,
+		textarea:textarea$1,
 		money:money,
 		link:link,
 		image:image,
-		tickCross:tickCross,
+		tickCross:tickCross$1,
 		datetime:datetime$1,
 		datetimediff:datetimediff,
 		lookup:lookup,
-		star:star,
+		star:star$1,
 		traffic:traffic,
-		progress:progress,
+		progress:progress$1,
 		color:color,
 		buttonTick:buttonTick,
 		buttonCross:buttonCross,
@@ -16769,7 +16730,7 @@
 		rowSelection:rowSelection,
 	};
 
-	class Format extends Module$1{
+	class Format extends Module{
 		
 		constructor(table){
 			super(table);
@@ -16980,9 +16941,7 @@
 	//load defaults
 	Format.formatters = defaultFormatters;
 
-	var Format$1 = Format;
-
-	class FrozenColumns extends Module$1{
+	class FrozenColumns extends Module{
 		
 		constructor(table){
 			super(table);
@@ -17279,9 +17238,7 @@
 
 	FrozenColumns.moduleName = "frozenColumns";
 
-	var FrozenColumns$1 = FrozenColumns;
-
-	class FrozenRows extends Module$1{
+	class FrozenRows extends Module{
 
 		constructor(table){
 			super(table);
@@ -17448,8 +17405,6 @@
 
 	FrozenRows.moduleName = "frozenRows";
 
-	var FrozenRows$1 = FrozenRows;
-
 	//public group object
 	class GroupComponent {
 		constructor (group){
@@ -17519,8 +17474,6 @@
 			return this._group.groupManager.table;
 		}
 	}
-
-	var GroupComponent$1 = GroupComponent;
 
 	//Group functions
 	class Group{
@@ -18126,16 +18079,14 @@
 		//////////////// Object Generation /////////////////
 		getComponent(){
 			if(!this.component){
-				this.component = new GroupComponent$1(this);
+				this.component = new GroupComponent(this);
 			}
 			
 			return this.component;
 		}
 	}
 
-	var Group$1 = Group;
-
-	class GroupRows extends Module$1{
+	class GroupRows extends Module{
 		
 		constructor(table){
 			super(table);
@@ -18447,12 +18398,12 @@
 		
 		rowMoving(from, to, after){
 			if(this.table.options.groupBy){
-				if(!after && to instanceof Group$1){
+				if(!after && to instanceof Group){
 					to = this.table.rowManager.prevDisplayRow(from) || to;
 				}
 				
-				var toGroup = to instanceof Group$1 ? to : to.modules.group;
-				var fromGroup = from instanceof Group$1 ? from : from.modules.group;
+				var toGroup = to instanceof Group ? to : to.modules.group;
+				var fromGroup = from instanceof Group ? from : from.modules.group;
 				
 				if(toGroup === fromGroup){
 					this.table.rowManager.moveRowInArray(toGroup.rows, from, to, after);
@@ -18640,7 +18591,7 @@
 			
 			oldGroups = oldGroups || [];
 			
-			group = new Group$1(this, false, level, groupID, this.groupIDLookups[0].field, this.headerGenerator[0], oldGroups[groupKey]);
+			group = new Group(this, false, level, groupID, this.groupIDLookups[0].field, this.headerGenerator[0], oldGroups[groupKey]);
 			
 			this.groups[groupKey] = group;
 			this.groupList.push(group);
@@ -18769,8 +18720,6 @@
 
 	GroupRows.moduleName = "groupRows";
 
-	var GroupRows$1 = GroupRows;
-
 	var defaultUndoers = {
 		cellEdit: function(action){
 			action.component.setValueProcessData(action.data.oldValue);
@@ -18829,7 +18778,7 @@
 		},
 	};
 
-	class History extends Module$1{
+	class History extends Module{
 
 		constructor(table){
 			super(table);
@@ -18993,9 +18942,7 @@
 	History.undoers = defaultUndoers;
 	History.redoers = defaultRedoers;
 
-	var History$1 = History;
-
-	class HtmlTableImport extends Module$1{
+	class HtmlTableImport extends Module{
 
 		constructor(table){
 			super(table);
@@ -19174,8 +19121,6 @@
 
 	HtmlTableImport.moduleName = "htmlTableImport";
 
-	var HtmlTableImport$1 = HtmlTableImport;
-
 	function csvImporter(input){
 		var data = [],
 		row = 0, 
@@ -19238,7 +19183,7 @@
 		return data;
 	}
 
-	function json(input){
+	function json$1(input){
 		try {
 			return JSON.parse(input);
 		} catch(e) {
@@ -19253,11 +19198,11 @@
 
 	var defaultImporters = {
 		csv:csvImporter,
-		json:json,
+		json:json$1,
 		array:arrayImporter,
 	};
 
-	class Import extends Module$1{
+	class Import extends Module{
 	    
 		constructor(table){
 			super(table);
@@ -19446,9 +19391,7 @@
 	//load defaults
 	Import.importers = defaultImporters;
 
-	var Import$1 = Import;
-
-	class Interaction extends Module$1{
+	class Interaction extends Module{
 
 		constructor(table){
 			super(table);
@@ -19764,7 +19707,7 @@
 
 				if(component instanceof Cell){
 					callback = component.column.definition[action];
-				}else if(component instanceof Column$1){
+				}else if(component instanceof Column){
 					callback = component.definition[action];
 				}
 
@@ -19778,8 +19721,6 @@
 	}
 
 	Interaction.moduleName = "interaction";
-
-	var Interaction$1 = Interaction;
 
 	var defaultBindings = {
 		navPrev:"shift + 9",
@@ -19915,7 +19856,7 @@
 		},
 	};
 
-	class Keybindings extends Module$1{
+	class Keybindings extends Module{
 
 		constructor(table){
 			super(table);
@@ -20082,9 +20023,7 @@
 	Keybindings.bindings = defaultBindings;
 	Keybindings.actions = defaultActions;
 
-	var Keybindings$1 = Keybindings;
-
-	class Menu extends Module$1{
+	class Menu extends Module{
 		
 		constructor(table){
 			super(table);
@@ -20383,9 +20322,7 @@
 
 	Menu.moduleName = "menu";
 
-	var Menu$1 = Menu;
-
-	class MoveColumns extends Module$1{
+	class MoveColumns extends Module{
 		
 		constructor(table){
 			super(table);
@@ -20680,9 +20617,7 @@
 
 	MoveColumns.moduleName = "moveColumn";
 
-	var MoveColumns$1 = MoveColumns;
-
-	class MoveRows extends Module$1{
+	class MoveRows extends Module{
 
 		constructor(table){
 			super(table);
@@ -21314,11 +21249,9 @@
 
 	MoveRows.moduleName = "moveRow";
 
-	var MoveRows$1 = MoveRows;
-
 	var defaultMutators = {};
 
-	class Mutator extends Module$1{
+	class Mutator extends Module{
 
 		constructor(table){
 			super(table);
@@ -21475,8 +21408,6 @@
 	//load defaults
 	Mutator.mutators = defaultMutators;
 
-	var Mutator$1 = Mutator;
-
 	function rows(pageSize, currentRow, currentPage, totalRows, totalPages){
 		var el = document.createElement("span"),
 		showingEl = document.createElement("span"),
@@ -21557,7 +21488,7 @@
 		pages:pages,
 	};
 
-	class Page extends Module$1{
+	class Page extends Module{
 		
 		constructor(table){
 			super(table);
@@ -22431,8 +22362,6 @@
 	//load defaults
 	Page.pageCounters = defaultPageCounters;
 
-	var Page$1 = Page;
-
 	// read persistance information from storage
 	var defaultReaders = {
 		local:function(id, type){
@@ -22477,7 +22406,7 @@
 		}
 	};
 
-	class Persistence extends Module$1{
+	class Persistence extends Module{
 
 		constructor(table){
 			super(table);
@@ -22946,9 +22875,7 @@
 	Persistence.readers = defaultReaders;
 	Persistence.writers = defaultWriters;
 
-	var Persistence$1 = Persistence;
-
-	class Popup extends Module$1{
+	class Popup$1 extends Module{
 		
 		constructor(table){
 			super(table);
@@ -23174,11 +23101,9 @@
 		}
 	}
 
-	Popup.moduleName = "popup";
+	Popup$1.moduleName = "popup";
 
-	var Popup$1 = Popup;
-
-	class Print extends Module$1{
+	class Print extends Module{
 
 		constructor(table){
 			super(table);
@@ -23313,9 +23238,7 @@
 
 	Print.moduleName = "print";
 
-	var Print$1 = Print;
-
-	class ReactiveData extends Module$1{
+	class ReactiveData extends Module{
 		
 		constructor(table){
 			super(table);
@@ -23717,9 +23640,7 @@
 
 	ReactiveData.moduleName = "reactiveData";
 
-	var ReactiveData$1 = ReactiveData;
-
-	class ResizeColumns extends Module$1{
+	class ResizeColumns extends Module{
 		
 		constructor(table){
 			super(table);
@@ -24027,9 +23948,7 @@
 
 	ResizeColumns.moduleName = "resizeColumns";
 
-	var ResizeColumns$1 = ResizeColumns;
-
-	class ResizeRows extends Module$1{
+	class ResizeRows extends Module{
 
 		constructor(table){
 			super(table);
@@ -24138,9 +24057,7 @@
 
 	ResizeRows.moduleName = "resizeRows";
 
-	var ResizeRows$1 = ResizeRows;
-
-	class ResizeTable extends Module$1{
+	class ResizeTable extends Module{
 		
 		constructor(table){
 			super(table);
@@ -24297,9 +24214,7 @@
 
 	ResizeTable.moduleName = "resizeTable";
 
-	var ResizeTable$1 = ResizeTable;
-
-	class ResponsiveLayout extends Module$1{
+	class ResponsiveLayout extends Module{
 
 		constructor(table){
 			super(table);
@@ -24658,9 +24573,7 @@
 
 	ResponsiveLayout.moduleName = "responsiveLayout";
 
-	var ResponsiveLayout$1 = ResponsiveLayout;
-
-	class SelectRow extends Module$1{
+	class SelectRow extends Module{
 		
 		constructor(table){
 			super(table);
@@ -25132,10 +25045,8 @@
 
 	SelectRow.moduleName = "selectRow";
 
-	var SelectRow$1 = SelectRow;
-
 	//sort numbers
-	function number(a, b, aRow, bRow, column, dir, params){
+	function number$1(a, b, aRow, bRow, column, dir, params){
 		var alignEmptyValues = params.alignEmptyValues;
 		var decimal = params.decimalSeparator;
 		var thousand = params.thousandSeparator;
@@ -25211,7 +25122,7 @@
 	}
 
 	//sort datetime
-	function datetime(a, b, aRow, bRow, column, dir, params){
+	function datetime$2(a, b, aRow, bRow, column, dir, params){
 		var DT = window.DateTime || luxon.DateTime;
 		var format = params.format || "dd/MM/yyyy HH:mm:ss",
 		alignEmptyValues = params.alignEmptyValues,
@@ -25256,21 +25167,21 @@
 	}
 
 	//sort date
-	function date(a, b, aRow, bRow, column, dir, params){
+	function date$1(a, b, aRow, bRow, column, dir, params){
 		if(!params.format){
 			params.format = "dd/MM/yyyy";
 		}
 
-		return datetime.call(this, a, b, aRow, bRow, column, dir, params);
+		return datetime$2.call(this, a, b, aRow, bRow, column, dir, params);
 	}
 
 	//sort times
-	function time(a, b, aRow, bRow, column, dir, params){
+	function time$1(a, b, aRow, bRow, column, dir, params){
 		if(!params.format){
 			params.format = "HH:mm";
 		}
 
-		return datetime.call(this, a, b, aRow, bRow, column, dir, params);
+		return datetime$2.call(this, a, b, aRow, bRow, column, dir, params);
 	}
 
 	//sort booleans
@@ -25390,18 +25301,18 @@
 	}
 
 	var defaultSorters = {
-		number:number,
+		number:number$1,
 		string:string,
-		date:date,
-		time:time,
-		datetime:datetime,
+		date:date$1,
+		time:time$1,
+		datetime:datetime$2,
 		boolean:boolean,
 		array:array,
 		exists:exists,
 		alphanum:alphanum
 	};
 
-	class Sort extends Module$1{
+	class Sort extends Module{
 
 		constructor(table){
 			super(table);
@@ -25867,9 +25778,7 @@
 	//load defaults
 	Sort.sorters = defaultSorters;
 
-	var Sort$1 = Sort;
-
-	class Tooltip extends Module$1{
+	class Tooltip extends Module{
 		
 		constructor(table){
 			super(table);
@@ -25994,8 +25903,6 @@
 	}
 
 	Tooltip.moduleName = "tooltip";
-
-	var Tooltip$1 = Tooltip;
 
 	var defaultValidators = {
 		//is integer
@@ -26137,7 +26044,7 @@
 		},
 	};
 
-	class Validate extends Module$1{
+	class Validate extends Module{
 		
 		constructor(table){
 			super(table);
@@ -26437,57 +26344,53 @@
 	//load defaults
 	Validate.validators = defaultValidators;
 
-	var Validate$1 = Validate;
-
 	var modules = /*#__PURE__*/Object.freeze({
 		__proto__: null,
-		AccessorModule: Accessor$1,
-		AjaxModule: Ajax$1,
-		ClipboardModule: Clipboard$1,
-		ColumnCalcsModule: ColumnCalcs$1,
-		DataTreeModule: DataTree$1,
-		DownloadModule: Download$1,
+		AccessorModule: Accessor,
+		AjaxModule: Ajax,
+		ClipboardModule: Clipboard,
+		ColumnCalcsModule: ColumnCalcs,
+		DataTreeModule: DataTree,
+		DownloadModule: Download,
 		EditModule: Edit$1,
-		ExportModule: Export$1,
-		FilterModule: Filter$1,
-		FormatModule: Format$1,
-		FrozenColumnsModule: FrozenColumns$1,
-		FrozenRowsModule: FrozenRows$1,
-		GroupRowsModule: GroupRows$1,
-		HistoryModule: History$1,
-		HtmlTableImportModule: HtmlTableImport$1,
-		ImportModule: Import$1,
-		InteractionModule: Interaction$1,
-		KeybindingsModule: Keybindings$1,
-		MenuModule: Menu$1,
-		MoveColumnsModule: MoveColumns$1,
-		MoveRowsModule: MoveRows$1,
-		MutatorModule: Mutator$1,
-		PageModule: Page$1,
-		PersistenceModule: Persistence$1,
+		ExportModule: Export,
+		FilterModule: Filter,
+		FormatModule: Format,
+		FrozenColumnsModule: FrozenColumns,
+		FrozenRowsModule: FrozenRows,
+		GroupRowsModule: GroupRows,
+		HistoryModule: History,
+		HtmlTableImportModule: HtmlTableImport,
+		ImportModule: Import,
+		InteractionModule: Interaction,
+		KeybindingsModule: Keybindings,
+		MenuModule: Menu,
+		MoveColumnsModule: MoveColumns,
+		MoveRowsModule: MoveRows,
+		MutatorModule: Mutator,
+		PageModule: Page,
+		PersistenceModule: Persistence,
 		PopupModule: Popup$1,
-		PrintModule: Print$1,
-		ReactiveDataModule: ReactiveData$1,
-		ResizeColumnsModule: ResizeColumns$1,
-		ResizeRowsModule: ResizeRows$1,
-		ResizeTableModule: ResizeTable$1,
-		ResponsiveLayoutModule: ResponsiveLayout$1,
-		SelectRowModule: SelectRow$1,
-		SortModule: Sort$1,
-		TooltipModule: Tooltip$1,
-		ValidateModule: Validate$1
+		PrintModule: Print,
+		ReactiveDataModule: ReactiveData,
+		ResizeColumnsModule: ResizeColumns,
+		ResizeRowsModule: ResizeRows,
+		ResizeTableModule: ResizeTable,
+		ResponsiveLayoutModule: ResponsiveLayout,
+		SelectRowModule: SelectRow,
+		SortModule: Sort,
+		TooltipModule: Tooltip,
+		ValidateModule: Validate
 	});
 
 	//tabulator with all modules installed
 
-	class TabulatorFull extends Tabulator$1 {}
+	class TabulatorFull extends Tabulator {}
 
 	//bind modules and static functionality
 	new ModuleBinder(TabulatorFull, modules);
 
-	var TabulatorFull$1 = TabulatorFull;
+	return TabulatorFull;
 
-	return TabulatorFull$1;
-
-}));
+})));
 //# sourceMappingURL=tabulator.js.map
