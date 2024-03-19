@@ -1,7 +1,9 @@
 import Module from '../../core/Module.js';
 import Helpers from '../../core/tools/Helpers.js';
 
-class MoveColumns extends Module{
+export default class MoveColumns extends Module{
+
+	static moduleName = "moveColumn";
 	
 	constructor(table){
 		super(table);
@@ -37,15 +39,20 @@ class MoveColumns extends Module{
 	initialize(){
 		if(this.table.options.movableColumns){
 			this.subscribe("column-init", this.initializeColumn.bind(this));
+			this.subscribe("alert-show", this.abortMove.bind(this));
 		}
+	}
+
+	abortMove(){
+		clearTimeout(this.checkTimeout);
 	}
 	
 	initializeColumn(column){
 		var self = this,
 		config = {},
 		colEl;
-		
-		if(!column.modules.frozen && !column.isGroup){
+
+		if(!column.modules.frozen && !column.isGroup && !column.isRowHeader){
 			colEl = column.getElement();
 			
 			config.mousemove = function(e){
@@ -293,7 +300,3 @@ class MoveColumns extends Module{
 		}
 	}
 }
-
-MoveColumns.moduleName = "moveColumn";
-
-export default MoveColumns;

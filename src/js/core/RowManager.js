@@ -194,7 +194,7 @@ export default class RowManager extends CoreFeature{
 	
 	getRowFromPosition(position){
 		return this.getDisplayRows().find((row) => {
-			return row.getPosition() === position && row.isDisplayed();
+			return row.type === "row" && row.getPosition() === position && row.isDisplayed();
 		});
 	}
 	
@@ -344,7 +344,7 @@ export default class RowManager extends CoreFeature{
 			
 			this.regenerateRowPositions();
 			
-			if(rows.length){
+			if(this.displayRowsCount){
 				this._clearPlaceholder();
 			}
 			
@@ -973,6 +973,14 @@ export default class RowManager extends CoreFeature{
 		this.renderEmptyScroll();
 		this._showPlaceholder();
 	}
+
+	checkPlaceholder(){
+		if(this.displayRowsCount){
+			this._clearPlaceholder();
+		}else{
+			this.tableEmpty();
+		}
+	}
 	
 	_showPlaceholder(){
 		if(this.placeholder){
@@ -1101,13 +1109,11 @@ export default class RowManager extends CoreFeature{
 	
 	//redraw table
 	redraw (force){
-		const resized = this.adjustTableSize();
+		this.adjustTableSize();
 		this.table.tableWidth = this.table.element.clientWidth;
 		
-		if(!force){
-			if(resized) {
-				this.reRenderInPosition();
-			}
+		if(!force){	
+			this.reRenderInPosition();
 			this.scrollHorizontal(this.scrollLeft);
 		}else{
 			this.renderTable();
