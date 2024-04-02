@@ -58,22 +58,25 @@ export default class Import extends Module{
 		return importer;
 	}
     
-	importFromFile(importFormat, extension){
+	importFromFile(importFormat, extension, importReader){
 		var importer = this.lookupImporter(importFormat);
         
 		if(importer){
-			return this.pickFile(extension)
+			return this.pickFile(extension, importReader)
 				.then(this.importData.bind(this, importer))
 				.then(this.structureData.bind(this))
 				.then(this.setData.bind(this))
 				.catch((err) => {
+					this.dispatch("import-error", err);
+					this.dispatchExternal("importError", err);
+
 					console.error("Import Error:", err || "Unable to import file");
 					return Promise.reject(err);
 				});
 		}
 	}
     
-	pickFile(extensions){
+	pickFile(extensions, importReader){
 		return new Promise((resolve, reject) => {
 			var input = document.createElement("input");
 			input.type = "file";
@@ -82,8 +85,11 @@ export default class Import extends Module{
 			input.addEventListener("change", (e) => {
 				var file = input.files[0],
 				reader = new FileReader();
+
+				this.dispatch("import-importing", input.files);
+				this.dispatchExternal("importImporting", input.files);
                 
-				switch(this.table.options.importReader){
+				switch(importReader || this.table.options.importReader){
 					case "buffer":
 						reader.readAsArrayBuffer(file);
 						break;
@@ -110,7 +116,9 @@ export default class Import extends Module{
 					reject();
 				};
 			});
-            
+			
+			this.dispatch("import-choose");
+			this.dispatchExternal("importChoose");
 			input.click();
 		});
 	}
@@ -187,6 +195,9 @@ export default class Import extends Module{
 	}
     
 	setData(data){
+		this.dispatch("import-imported", data);
+		this.dispatchExternal("importImported", data);
+		
 		return this.table.setData(data);
 	}
 }
