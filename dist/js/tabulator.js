@@ -25027,6 +25027,7 @@
 			this.collapseFormatter = [];
 			this.collapseStartOpen = true;
 			this.collapseHandleColumn = false;
+			this.preventRedrawRecursion = false;
 
 			this.registerTableOption("responsiveLayout", false); //responsive layout flags
 			this.registerTableOption("responsiveLayoutCollapseStartOpen", true); //start showing collapsed data
@@ -25048,7 +25049,7 @@
 				this.subscribe("column-delete", this.initializeResponsivity.bind(this));
 
 				this.subscribe("table-redrawing", this.tableRedraw.bind(this));
-				
+
 				if(this.table.options.responsiveLayout === "collapse"){
 					this.subscribe("row-data-changed", this.generateCollapsedRowContent.bind(this));
 					this.subscribe("row-init", this.initializeRow.bind(this));
@@ -25204,6 +25205,10 @@
 		update(){
 			var working = true;
 
+			if(this.preventRedrawRecursion){
+				return;
+			}
+
 			while(working){
 
 				let width = this.table.modules.layout.getMode() == "fitColumns" ? this.table.columnManager.getFlexBaseWidth() : this.table.columnManager.getWidth();
@@ -25215,6 +25220,15 @@
 					let column = this.columns[this.index];
 
 					if(column){
+						if(this.table.initialized){
+							// If the browser window is reduced very rapidly, the width of this column may still be outdated
+							// and much larger than it actually is. Therefore, recalculate the actual width of the column before it is hidden.
+							// (prevent recursion when doing so)
+							this.preventRedrawRecursion = true;
+							this.table.redraw(true);
+							this.preventRedrawRecursion = false;
+						}
+
 						this.hideColumn(column);
 						this.index ++;
 					}else {
