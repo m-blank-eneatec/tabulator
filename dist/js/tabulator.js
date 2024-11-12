@@ -4773,6 +4773,7 @@
 			this.scrollbarWidth = 0;
 			
 			this.renderer = null;
+			this.preventRedrawRecursion = false;
 		}
 		
 		//////////////// Setup Functions /////////////////
@@ -5794,10 +5795,26 @@
 				//check if the table has changed size when dealing with variable height tables
 				if(!this.fixedHeight && initialHeight != this.element.clientHeight){
 					resized = true;
-					if(this.subscribed("table-resize")){
-						this.dispatch("table-resize");
-					}else {
-						this.redraw();
+					
+					// Since version 6.0.0 (or even 5.6.1?) of Tabulator, the adjustTableSize method is often called recursively, causing the browser tab to crash.
+					// It seems to be related to browser sizing. If the browser is zoomed out (e.g. to 80%) the issue is more likely to occur.
+					//
+					// There are 2 Github issues regarding this bug:
+					// https://github.com/olifolkerd/tabulator/issues/4467
+					// https://github.com/olifolkerd/tabulator/issues/4419
+					//
+					// This is a temporary fix for the recursion. Maybe this bug will get an official fix soon:
+					// https://github.com/olifolkerd/tabulator/pull/4598
+					if(!this.preventRedrawRecursion){
+						this.preventRedrawRecursion = true;
+						
+						if(this.subscribed("table-resize")){
+							this.dispatch("table-resize");
+						}else {
+							this.redraw();
+						}
+						
+						this.preventRedrawRecursion = false;
 					}
 				}
 				
